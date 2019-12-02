@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itfh.mapper.TypeMapper">
+    <select id="typeList" resultType="com.itzzy.po.Type" parameterType="com.itzzy.pram.TypePram">
+        select id,name from t_type
+        order by id desc
+        limit #{start},#{length}
+    </select>
+
+    <select id="querycount" resultType="long" parameterType="com.itzzy.pram.TypePram">
+        select count(*) from t_type
+        where 1=1
+    </select>
+
+    <select id="jointbytype" resultType="com.itzzy.po.Type">
+        select id,name,pid from t_type;
+    </select>
+</mapper>

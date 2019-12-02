@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ituser.mapper.User.UserMapper">
+    <select id="finduserbyname" resultType="com.itzzy.po.User" parameterType="string">
+        select id,password,salt from t_usera where name=#{name}
+    </select>
+
+    <insert id="adduser" parameterType="com.itzzy.po.User">
+        insert into t_usera (realname,name,password,sex,age,phone,emil,pay,ruzhitime)
+        values (#{realname},#{name},#{password},#{sex},#{age},#{phone},#{emil},#{pay},
+        #{ruzhitime})
+    </insert>
+
+    <select id="userlist" resultType="com.itzzy.po.User" parameterType="com.itzzy.pram.UserPram">
+        select id,realname,name,password,sex,age,phone,emil,pay,ruzhitime from t_usera
+        order by id desc
+        limit #{start},#{length}
+    </select>
+
+    <select id="querycount" resultType="long" parameterType="com.itzzy.pram.UserPram">
+        select count(*) fromt_usera
+    </select>
+
+    <select id="finduserbyphone" resultType="com.itzzy.po.User" parameterType="string">
+        select id,realname,verify,cartid from t_usera where phone=#{phone}
+    </select>
+
+    <update id="updateverify" parameterType="com.itzzy.po.User">
+        update t_usera set verify=#{verify} where id=#{id}
+    </update>
+
+    <update id="setverifyisnull" parameterType="com.itzzy.po.User">
+        update t_usera set verify=null where id=#{id}
+    </update>
+
+    <insert id="registeruser" parameterType="com.itzzy.po.User">
+        insert into t_usera set phone=#{phone},cartid=#{cartid}
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+</mapper>

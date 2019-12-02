@@ -1,0 +1,21 @@
+spring:
+  datasource:
+      url: jdbc:mysql://localhost:3307/admin?characterEncoding=utf8&useSSL=true&serverTimezone=UTC&zeroDateTimeBehavior=CONVERT_TO_NULL
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+      host: localhost
+      port: 6379
+      database: 0
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+      map-underscore-to-camel-case: true
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+      com.itfh.*.mapper: trace
+server:
+  port: 8081
+

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyzzz.mapper.Shop.ShopMapper">
+    <sql id="userserch">
+        <where>
+            <if test="typeid!=null and typeid!=''">
+                and st.typeid=#{typeid}
+            </if>
+            <if test="brandid!=null and brandid!=''">
+                and bt.brandid=#{brandid}
+            </if>
+        </where>
+    </sql>
+    <select id="shoplist" resultType="com.itzzy.po.Shop" parameterType="com.itzzy.pram.ShopPram">
+        select distinct sp.id,sp.typeid,sp.name,sp.subtitle,sp.main_img,sp.sub_imgs,
+        sp.detail,sp.price,sp.stock,sp.status,sp.create_time,sp.update_time
+        from t_shop_product sp left join t_shop_type st on sp.id=st.shopid
+        LEFT JOIN t_brand_type bt on st.typeid=bt.typeid
+        <include refid="userserch"></include>
+        limit #{start},#{length}
+    </select>
+
+    <select id="querycount" resultType="long" parameterType="com.itzzy.pram.ShopPram">
+        select distinct count(distinct sp.id) from t_shop_product sp left join t_shop_type st on sp.id=st.shopid
+        LEFT JOIN t_brand_type bt on st.typeid=bt.typeid
+        <include refid="userserch"></include>
+    </select>
+
+    <insert id="addtest" parameterType="com.itzzy.po.Shop">
+        insert into t_shop_product (brand_id) values (#{brand_id})
+    </insert>
+
+    <select id="findshopbyid" resultType="com.itzzy.po.Shop" parameterType="java.lang.Integer">
+        select id,name,subtitle,main_img,sub_imgs,detail,price from t_shop_product where id=#{productid}
+    </select>
+</mapper>

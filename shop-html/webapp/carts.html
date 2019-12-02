@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        .page {
+            margin-top: 55px;
+        }
+    </style>
+    <title>购物车</title>
+    <link rel="stylesheet" href="/carts/css/carts.css">
+    <link rel="stylesheet" href="/carts/css/reset.css">
+    <link rel="stylesheet" href="/commons/js/bootstrap-3.3.7-dist/bootstrap-3.3.7-dist/css/bootstrap.min.css"
+          type="text/css">
+</head>
+<body>
+<div id="page" class="page"></div>
+<section class="cartMain" id="main">
+
+    <div class="cartMain_hd">
+        <ul class="order_lists cartTop">
+            <li class="list_chk">
+                <!--所有商品全选-->
+                <input type="checkbox" id="all" class="whole_check" th:checked="${checkeAll}?'true':'false'">
+                <label for="all" id="topcheckbox" onclick="allcheck()"></label>
+                全选
+            </li>
+            <li class="list_con">商品信息</li>
+            <li class="list_price">单价</li>
+            <li class="list_amount">数量</li>
+            <li class="list_sum">金额</li>
+            <li class="list_op">操作</li>
+        </ul>
+    </div>
+
+
+    <div class="cartBox"> <!--主要部分-->
+    </div>
+
+
+    <!--底部-->
+    <div class="bar-wrapper" id="bottoms">
+    </div>
+
+</section>
+<section class="model_bg"></section>
+<section class="my_model">
+    <p class="title">删除宝贝<span class="closeModel">X</span></p>
+    <p>您确认要删除该宝贝吗？</p>
+    <div class="opBtn"><a href="javascript:;" class="dialog-sure">确定</a><a href="javascript:;"
+                                                                           class="dialog-close">关闭</a></div>
+</section>
+
+<script type="text/javascript" src="/commons/js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="/commons/js/bootstrap-3.3.7-dist/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/commons/bootbox/bootbox.min.js"></script>
+<script type="text/javascript" src="/commons/bootbox/bootbox.locales.min.js"></script>
+<script type="text/javascript">
+    var token = document.cookie;
+    $(function () {
+        $("#page").load("daohang.html");
+        initajaxSetup();  //ajax统一设置前置通知
+        initcarts();
+    })
+
+
+    var cartsdata = "";
+    var checkedcount;
+    var total;
+
+    function initcarts() {
+        $.post({
+            url: "http://localhost:8085/cart/catcarts",
+            dataType: "json",
+            async: false,
+            beforeSend: function (request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function (data) {
+                if (data.code == 200) {
+                    var alldata = data.data;
+                    var cartdata = alldata.cartdata;
+                    checkedcount = alldata.checkedcount;
+                    total = alldata.total;
+                    for (var i = 0; i < cartdata.length; i++) {
+                        cartsdata += "<div class=\"order_content\">\n" +
+                            "            <ul class=\"order_lists\">\n" +
+                            "                <li class=\"list_chk\">\n" +
+                            "                    <input type=\"checkbox\"  id='checkbox+" + cartdata[i].id + "'  class=\"son_check\" value=" + cartdata[i].id + " checked=" + cartdata[i].ischecked + ">\n" +
+                            "                    <label  id='checked" + cartdata[i].id + "' onclick='singlee(" + cartdata[i].id + ")' ></label>\n" +
+                            "                </li>\n" +
+                            "                <li class=\"list_con\">\n" +
+                            "                    <div class=\"list_img\"><a href=\"javascript:;\"><img src=" + cartdata[i].shopimg + " alt='快买呐还看！'></a></div>\n" +
+                            "                    <div class=\"list_text\"><a href=\"javascript:;\"><span>" + cartdata[i].shopname + "</span></a></div>\n" +
+                            "                </li>\n" +
+                            "                <li class=\"list_price\">\n" +
+                            "                    <p class=\"price\">￥<span >" + cartdata[i].price + "</span></p>\n" +
+                            "                </li>\n" +
+                            "                <li class=\"list_amount\">\n" +
+                            "                    <div class=\"amount_box\">\n" +
+                            "                        <a href=\"javascript:;\" class=\"reduce reSty\" onclick='jian(" + cartdata[i].id + ")'>-</a>\n" +
+                            "                        <input type=\"text\" class=\"sum\"  id='count" + cartdata[i].id + "' value=" + cartdata[i].count + " onchange='inputchange(" + cartdata[i].id + ")'>\n" +
+                            "                        <a href=\"javascript:;\" class=\"plus\"  onclick='subtract(" + cartdata[i].id + ")'>+</a>\n" +
+                            "                    </div>\n" +
+                            "                </li>\n" +
+                            "                <li class=\"list_sum\">\n" +
+                            "                    <p class=\"sum_price\">￥<span >" + cartdata[i].subtotal + "</span></p>\n" +
+                            "                </li>\n" +
+                            "                <li class=\"list_op\">\n" +
+                            "                    <p class=\"del\"><a href=\"javascript:;\" class=\"delBtn\" onclick='remove(" + cartdata[i].id + ")'>移除商品</a></p>\n" +
+                            "                </li>\n" +
+                            "            </ul>\n" +
+                            "        </div>"
+                    }
+                    $(".cartBox").html(cartsdata);
+                    cartsdata = "";  //拼接主要部分完成
+                    
+                    //拼接底部
+                    joinbottom();
+                    //根据判断添加样式
+                    var count = 0;
+                    var account = 0;
+                    for (var i = 0; i < cartdata.length; i++) {
+                        if (cartdata[i].ischecked) {
+                            var checkid = "checked" + cartdata[i].id;
+                            $("#" + checkid).attr('class', 'mark');
+                            $("#account").css('background-color', '#A60000');
+                        } else {
+                            var checkid = "checked" + cartdata[i].id;
+                            $("#" + checkid).attr('class', '');
+                            account++;
+                            if (account == cartdata.length) {
+                                $("#account").css('background-color', '');
+                            }
+                        }
+                        if (cartdata[i].ischecked) {
+                            count++;
+                        }
+                        if (count == cartdata.length) {
+                            $("#topcheckbox").attr('class', 'mark');
+                        } else {
+                            $("#topcheckbox").attr('class', '');
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    var bottom = "";
+
+    //拼接底部.
+    function joinbottom() {
+        $("#bottoms").html("");
+        bottom += "        <div class=\"bar-right\">\n" +
+            "            <div class=\"piece\">已选商品<strong class=\"piece_num\">" + checkedcount + "</strong>件</div>\n" +
+            "            <div class=\"totalMoney\">共计: <strong class=\"total_text\" >" + total + "</strong></div>\n" +
+            "            <div class=\"calBtn\"><a href=\"javascript:;\" id='account'>结算</a></div>\n" +
+            "        </div>";
+        $("#bottoms").html(bottom);
+        bottom = "";
+    }
+
+    //加
+    function subtract(shopid) {
+        $.post({
+            url: "http://localhost:8085/cart/incrcart",
+            dataType: "json",
+            data: {"shopid": shopid},
+            beforeSend: function (request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function (data) {
+                if (data.code == 200) {
+                    initcarts();
+                }
+            }
+        })
+    }
+
+
+    //减
+    function jian(shopid) {
+        $.post({
+            url: "http://localhost:8085/cart/reduce",
+            dataType: "json",
+            data: {"shopid": shopid},
+            beforeSend: function (request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function (data) {
+                if (data.code == 200) {
+                    initcarts();
+                }
+            }
+        })
+    }
+
+
+    //删
+    function remove(shopid) {
+        bootbox.confirm({
+            title: "更新状态",
+            message: "你确认要移除该条商品嘛？",
+            buttons: {
+                cancel: {
+                    label: '<i class="fa fa-times"></i> 取消'
+                },
+                confirm: {
+                    label: '<i class="fa fa-check"></i>确认'
+                }
+            },
+            callback: function (result) {
+                if (result) {
+                    $.post({
+                        url: "http://localhost:8085/cart/remove",
+                        dataType: "json",
+                        data: {"shopid": shopid},
+                        beforeSend: function (request) {
+                            request.setRequestHeader("token", token);
+                        },
+                        success: function (data) {
+                            if (data.code == 200) {
+                                initcarts();
+                            }
+                        }
+                    })
+                }
+            }
+        });
+    }
+
+    //单点
+    function singlee(shopid) {
+        $.post({
+            url: "http://localhost:8085/cart/uncheck",
+            dataType: "json",
+            data: {"shopid": shopid},
+            beforeSend: function (request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function (data) {
+                if (data.code === 200) {
+                    initcarts();
+                }
+            }
+        })
+    }
+
+
+    function allcheck() {
+        var checkclass = $("#topcheckbox").attr('class');
+        $.post({
+            url: "http://localhost:8085/cart/isallcheck",
+            dataType: "json",
+            data: {"checkclass": checkclass},
+            beforeSend: function (request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function (data) {
+                if (data.code == 200) {
+                    initcarts();
+                }
+            }
+        })
+    }
+
+    function inputchange(shopid) {
+        var countid = 'count' + shopid;
+        var count = $("#" + countid).val();
+        if (count >= 100) {
+            alert("单个数量不能大于100哦");
+        } else {
+            $.post({
+                url: "http://localhost:8085/cart/updatecount",
+                dataType: "json",
+                data: {"count": count, "shopid": shopid},
+                beforeSend: function (request) {
+                    request.setRequestHeader("token", token);
+                },
+                success: function (data) {
+                    if (data.code == 200) {
+                        initcarts();
+                    }
+                }
+            })
+        }
+    }
+
+    //页面加载：设置全局ajax请求后的执行动作
+    function initajaxSetup() {
+        $.ajaxSetup({
+            beforeSend: function (request) {
+                request.setRequestHeader("token", token);
+            }
+        });
+    }
+
+
+</script>
+</body>
+</html>

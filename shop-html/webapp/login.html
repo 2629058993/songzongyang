@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="commons/login/login.css">
+    <link rel="stylesheet" href="/commons/js/bootstrap-3.3.7-dist/bootstrap-3.3.7-dist/css/bootstrap.min.css"
+          type="text/css">
+</head>
+<body>
+<div class="login-bg">
+    <div class="content">
+        <div class="title">
+            <h2>登录</h2>
+        </div>
+        <div class="form-box">
+            <div class="login-center">
+                <span class="t-name">手机号：</span><input type="text" name="" id="tel_num" class="inp phone-inp" value=""
+                                                       placeholder="请输入您的手机号">
+            </div>
+
+            <div class="login-center">
+                <span class="t-name">验证码：</span><input type="text" name="" id="code_num" class="inp code-inp" value=""
+                                                       placeholder="请输入您的验证码">
+                <div class="get-code">
+                    <span class="code-btn">获取验证码</span>
+                </div>
+            </div>
+
+            <div class="login-button" onclick="login()">登陆</div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/commons/js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="/commons/js/bootstrap-3.3.7-dist/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+<script type="text/javascript" src="/commons/bootbox/bootbox.locales.min.js"></script>
+<script type="text/javascript" src="/commons/bootbox/bootbox.min.js"></script>
+<script>
+    var code_time = 90;
+
+    function time_inter() {
+        $('.code-btn').addClass('code-btn-gray');
+        var timeflag = setInterval(function () {
+            $('.code-btn-gray').html("" + code_time + "s后获取").css({
+                "cursor": "no-",
+                "color": "#999"
+            });
+            code_time--;
+            if (code_time == 0) {
+                clearInterval(timeflag);
+                $('.code-btn-gray').html("获取验证码").css({
+                    "cursor": "pointer",
+                    "color": "#a07941"
+                });
+                $('.code-btn').removeClass('code-btn-gray');
+            }
+        }, 1000)
+
+    }
+
+    //获取验证码点击事件
+    $('.code-btn').on('click', function () {
+        if ($(this).hasClass('code-btn-gray')) {
+            return false;
+        }
+        var tel_num = $('#tel_num').val();
+        if (tel_num && tel_num.length == 11) {
+            time_inter(); //按钮倒计时
+            $.post({
+                url: "http://localhost:8080/usertest/login",
+                data: {"telnum": tel_num},
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data.code == 200) {
+                        bootbox.alert({
+                            message: "语音验证码已发送！请注意接听",
+                            size: 'small'
+                        });
+                    } else {
+                        bootbox.alert({
+                            message: data.msg,
+                            size: 'small'
+                        });
+                    }
+                }
+            })
+        } else {
+            bootbox.alert({
+                message: '请输入正确手机号码',
+                size: 'small'
+            });
+        }
+    })
+
+    function login() {
+        var phone = $("#tel_num").val();
+        var yanzhengma = $("#code_num").val();
+        if (yanzhengma == "" || yanzhengma == null || phone == "" || phone == null) {
+            bootbox.alert({
+                message: "手机号或验证码未填!",
+                size: 'small'
+            });
+            return false;
+        }
+        $.post({
+            url: "http://localhost:8080/usertest/yanzheng",
+            data: {"phone": phone, "verification": yanzhengma},
+            async: false,
+            dataType: "json",
+            success: function (data) {
+                if (data.code == 200) {
+                    var token = data.data;
+                    document.cookie = token;
+                    location.href = "index.html";
+                } else {
+                    bootbox.alert({
+                        message: data.msg,
+                        size: 'small'
+                    });
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>
