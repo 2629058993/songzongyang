@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Aspect
 @Component
-@CrossOrigin(maxAge = 3600, origins = "http://localhost:8083")
+@CrossOrigin(maxAge = 3600, origins = "http://localhost:8083", exposedHeaders = "NOLOGIN")
 public class InFoaApect {
     @Resource
     private HttpServletRequest request;

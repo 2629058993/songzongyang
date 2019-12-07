@@ -25,7 +25,7 @@ public class JWTUtil {
     public static String createToken(Long id) throws UnsupportedEncodingException {
         //过期时间  三十分钟过期
         Calendar nowTime = Calendar.getInstance();
-        nowTime.add(Calendar.MINUTE, 30);
+        nowTime.add(Calendar.MINUTE, 240);
         Date expiresDate = nowTime.getTime();
         //下面进行加密出一个token
         Map<String, Object> map = new HashMap<>();
@@ -37,7 +37,7 @@ public class JWTUtil {
                 .withExpiresAt(expiresDate) //设置过期时间
                 .withIssuedAt(Constant.IADDATE)      //设置签发时间
                 .sign(Algorithm.HMAC256(Constant.SECRET));  //加密
-        return "Bearer:"+token;
+        return "Bearer:" + token;
     }
 
     //解密token

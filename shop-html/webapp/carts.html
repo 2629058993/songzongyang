@@ -117,7 +117,7 @@
                     }
                     $(".cartBox").html(cartsdata);
                     cartsdata = "";  //拼接主要部分完成
-                    
+
                     //拼接底部
                     joinbottom();
                     //根据判断添加样式
@@ -158,7 +158,7 @@
         bottom += "        <div class=\"bar-right\">\n" +
             "            <div class=\"piece\">已选商品<strong class=\"piece_num\">" + checkedcount + "</strong>件</div>\n" +
             "            <div class=\"totalMoney\">共计: <strong class=\"total_text\" >" + total + "</strong></div>\n" +
-            "            <div class=\"calBtn\"><a href=\"javascript:;\" id='account'>结算</a></div>\n" +
+            "            <div class=\"calBtn\"><a href='#' onclick='goorder()' id='account'>结算</a></div>\n" +
             "        </div>";
         $("#bottoms").html(bottom);
         bottom = "";
@@ -287,6 +287,18 @@
                     }
                 }
             })
+        }
+    }
+
+
+    //跳向结算页面
+    function goorder() {
+        var color = $("#account").css("background-color");
+        var demo = 'rgb(166, 0, 0)';
+        if (color.indexOf(demo) != -1) {
+            location.href = "getOrderInfo-student.html";
+        } else {
+            bootbox.alert("请选择商品再结算哦");
         }
     }
 

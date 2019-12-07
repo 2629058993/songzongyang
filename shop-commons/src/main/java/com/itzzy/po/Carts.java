@@ -20,4 +20,6 @@ public class Carts implements Serializable {
     private int count;
 
     private Boolean ischecked;
+
+    private Boolean isstock;
 }

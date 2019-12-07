@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyorder.mapper.OrderMapper">
+    <select id="queryaddress" resultType="com.itzzy.po.OrderInfo" parameterType="java.lang.Integer">
+        select ad.id,ad.addressname,ad.recipientsname,ad.recipientsphone from t_user_address ua left  join  t_address  ad
+        on  ua.addressid=ad.id  where  ua.userid=#{userid}  order  by  addtime  desc
+    </select>
+
+    <update id="checkrecipient">
+        update  t_address  set addtime=#{date} where id=#{id}
+    </update>
+
+    <select id="queryorderbyid" resultType="com.itzzy.po.OrderInfo" parameterType="java.lang.Integer">
+         select id,addressname,recipientsname,recipientsphone,email  from  t_address
+         where  id=#{recipientid}
+    </select>
+
+    <insert id="addrecipients" parameterType="com.itzzy.po.OrderInfo">
+        <selectKey resultType="long" keyProperty="id" order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into t_address set addressname=#{addressname},addtime=#{addtime},
+        recipientsname=#{recipientsname},recipientsphone=#{recipientsphone},
+        email=#{email}
+    </insert>
+
+    <insert id="addorderanduser">
+        insert  into t_user_address set userid=#{userid},addressid=#{id}
+    </insert>
+
+    <update id="updaterecipients" parameterType="com.itzzy.po.OrderInfo">
+        update  t_address set addressname=#{addressname},addtime=#{addtime},
+        recipientsname=#{recipientsname},recipientsphone=#{recipientsphone},
+        email=#{email}   where id=#{id}
+    </update>
+
+    <delete id="deleterecipients" parameterType="java.lang.Integer">
+        delete from t_address   where id=#{recipientsid}
+    </delete>
+
+    <delete id="delrecipientsanduser" parameterType="java.lang.Integer">
+       delete  from t_user_address  where addressid=#{recipientsid}
+    </delete>
+</mapper>

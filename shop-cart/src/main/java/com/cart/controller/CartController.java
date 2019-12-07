@@ -82,9 +82,16 @@ public class CartController {
     //更新个数
     @PostMapping("updatecount")
     @ShopAnnotation
-    public ServerResponse updatecount(Integer count,String shopid) {
-        icartservice.updatecount(count,shopid);
+    public ServerResponse updatecount(Integer count, String shopid) {
+        icartservice.updatecount(count, shopid);
         return ServerResponse.success();
     }
 
+    //查询购物车
+    @PostMapping("querycarts")
+    @ShopAnnotation
+    public ServerResponse querycarts() {
+        Map<String, Object> cartsList = icartservice.querycarts();
+        return ServerResponse.success(cartsList);
+    }
 }

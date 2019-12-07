@@ -12,4 +12,5 @@ public final class Constant {
     //签发时间
     public static final Date IADDATE = new Date();
 
+    public static final int PAY_STATUS = 200;
 }

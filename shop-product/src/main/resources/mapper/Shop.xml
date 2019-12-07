@@ -32,6 +32,6 @@
     </insert>
 
     <select id="findshopbyid" resultType="com.itzzy.po.Shop" parameterType="java.lang.Integer">
-        select id,name,subtitle,main_img,sub_imgs,detail,price from t_shop_product where id=#{productid}
+        select id,name,subtitle,main_img,sub_imgs,detail,price,stock from t_shop_product where id=#{productid}
     </select>
 </mapper>

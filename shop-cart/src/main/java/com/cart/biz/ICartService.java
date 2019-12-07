@@ -18,4 +18,6 @@ public interface ICartService {
     void isallcheck(String checkclass);
 
     void updatecount(Integer count, String shopid);
+
+    Map<String, Object> querycarts();
 }

@@ -170,5 +170,34 @@ public class ICartServiceImpl implements ICartService {
         }
     }
 
+    @Override
+    public Map<String, Object> querycarts() {
+        Integer userid = (Integer) request.getAttribute("userid");
+        String carts = (String) redisUtil.get(userid + "cartid"); //购物车id
+        Map<Object, Object> hmget = redisUtil.hmget(carts);
+        Collection<Object> values = hmget.values();
+        List<Carts> cartsList = new ArrayList(values);  //获取全部购物车数据
+        List<Carts> newcartlist = new ArrayList<>();  //经过筛选的购物车数据
+        Integer cartcount = 0;    //选中数据总个数
+        BigDecimal total = new BigDecimal(0.00);  //每个小计加起来后的总额
+        for (Carts carts1 : cartsList) {
+            if (carts1.getIschecked()/* && carts1.getIsstock()*/) {
+                Carts carts2 = new Carts();
+                carts2.setShopname(carts1.getShopname());
+                carts2.setShopimg(carts1.getShopimg());
+                carts2.setSubtotal(carts1.getSubtotal());
+                carts2.setCount(carts1.getCount());
+                newcartlist.add(carts2);
+                cartcount = cartcount + carts1.getCount();
+                total = total.add(carts1.getSubtotal());
+            }
+        }
+        Map<String, Object> resultmap = new HashMap<>();
+        resultmap.put("cartdata", newcartlist);
+        resultmap.put("cartcount", cartcount);
+        resultmap.put("total", total);
+        return resultmap;
+    }
+
 
 }

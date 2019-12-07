@@ -108,7 +108,7 @@ public class UserControllerTest {
         String token = JWTUtil.createToken(user.getId());
         user.setVerify(null);
         redisUtil.set(user.getId()+"cartid",user.getCartid());
-        redisUtil.set("user", user);
+        redisUtil.set(user.getId()+"user", user);
         return ServerResponse.success(token);
     }
 }

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.realorder.mapper.ROrderMapper">
+    <update id="deductstock">
+        update  t_shop_product  set stock=stock- #{count} where
+        id=#{id}  and stock- #{count} >-1
+    </update>
+
+    <insert id="addorderdetail" parameterType="com.itzzy.po.ROrderdetails">
+        insert into t_order_details set orderid=#{orderid},userid=#{userid},
+        shopname=#{shopname},shoptotalprice=#{shoptotalprice},shoptotalcount
+        =#{shoptotalcount},shopid=#{shopid},shopimg=#{shopimg}
+    </insert>
+
+    <insert id="addorder" parameterType="com.itzzy.po.RealOrder">
+     insert into   t_order  set id=#{id},pay=#{pay},orderstatus=#{orderstatus}
+      ,createtime=#{createtime},paytype=#{paytype},
+        userid=#{userid},totalcount=#{totalcount},addressid=#{addressid}
+    </insert>
+
+    <insert id="addorderlog" parameterType="com.itzzy.po.ROrderLog">
+        insert   into  t_orderlog  set  outTradeNo=#{outTradeNo},orderid=#{orderid},
+        createtime=#{createtime},userid=#{userid},paymoney=#{paymoney},
+        paytype=#{paytype},paystatus=#{paystatus}
+    </insert>
+
+
+    <update id="updateorderstatus" parameterType="com.itzzy.po.RealOrder">
+        update  t_order  set orderstatus=#{orderstatus},paytime=#{paytime}
+        where   id=#{id}
+    </update>
+
+
+    <update id="updateorderlogstatus" parameterType="com.itzzy.po.ROrderLog">
+        update  t_orderlog  set  payTime=#{payTime},transactionId=#{transactionId},
+        paystatus=#{paystatus} where outTradeNo=#{outTradeNo}
+    </update>
+
+    <select id="searchorder" resultType="com.itzzy.po.RealOrder">
+        select  id,createtime,orderstatus,userid  from t_order   where orderstatus=100
+    </select>
+
+    <select id="querycartidbyuseid" parameterType="int" resultType="string">
+        select  cartid  from  t_usera   where id=#{userid}
+    </select>
+
+    <select id="queryorderdetaibyorderid" parameterType="string" resultType="com.itzzy.po.ROrderdetails">
+        select  shopname,shoptotalprice,shoptotalcount,shopid,shopimg  from t_order_details where orderid
+        =#{id}
+    </select>
+
+    <update id="addstockbyshopid">
+        update  t_shop_product  set stock=stock+ #{stock} where  id=#{shopid}
+    </update>
+
+
+    <delete id="deletebyorderid" parameterType="string">
+        delete  from  t_order  where  id=#{id}
+    </delete>
+
+    <delete id="deleteorderdetail" parameterType="string">
+        delete  from t_order_details where  orderid=#{id}
+    </delete>
+
+    <delete id="deleteorderlog" parameterType="string">
+        delete  from t_orderlog where  orderid=#{id}
+    </delete>
+</mapper>
