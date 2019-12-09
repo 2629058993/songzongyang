@@ -402,13 +402,20 @@
                             " <div class=\"num\">X" + cartdata[i].count + "</div>\n" +
                             "</li>\n" +
                             "<li class=\"yui3-u-1-12\">\n" +
-                            " <div class=\"num\">有货</div>\n" +
+                            " <div class=\"num\"  id='" + cartdata[i].id + "isstock'>" + cartdata[i].isstock + "</div>\n" +
                             "</li>" +
                             " </ul>\n" +
                             "</div>\n" +
                             "</li>";
                     }
                     $("#cartsdata").html(cartdatas);
+                    for (var i = 0; i < cartdata.length; i++) {
+                        if (cartdata[i].isstock) {
+                            $("#" + cartdata[i].id + "isstock").html("有货");
+                        } else {
+                            $("#" + cartdata[i].id + "isstock").html("无货");
+                        }
+                    }
                     cartdatas = "";
                     $("#count").html(cartcount);
                     $("#smalltotal").html(total);

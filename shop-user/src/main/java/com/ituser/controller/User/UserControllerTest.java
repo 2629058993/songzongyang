@@ -79,8 +79,8 @@ public class UserControllerTest {
             user.setCartid(UUID.randomUUID().toString());
             userService.registeruser(user);    //注册用户
         }
-        JSONObject sendmsg = SendCode.sendmsg(telnum);//已注册时发送验证码;
-        user.setVerify(sendmsg.getString("obj"));
+        //JSONObject sendmsg = SendCode.sendmsg(telnum);//已注册时发送验证码;
+        user.setVerify("123456");
         userService.updateverify(user);//将验证码存放数据库;
         timer = new Timer(false);  //获取定时器对象，90秒后自动清空验证码;
         User finalUser = user;
@@ -107,8 +107,8 @@ public class UserControllerTest {
         //完成验证返回token，并将用户信息保存在redis中
         String token = JWTUtil.createToken(user.getId());
         user.setVerify(null);
-        redisUtil.set(user.getId()+"cartid",user.getCartid());
-        redisUtil.set(user.getId()+"user", user);
+        redisUtil.set(user.getId() + "cartid", user.getCartid());
+        redisUtil.set(user.getId() + "user", user);
         return ServerResponse.success(token);
     }
 }

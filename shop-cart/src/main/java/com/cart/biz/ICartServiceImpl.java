@@ -95,9 +95,13 @@ public class ICartServiceImpl implements ICartService {
         boolean isexist = redisUtil.hHasKey(carts, shopid);
         if (isexist) {
             Carts hget = (Carts) redisUtil.hget(carts, shopid);
-            hget.setCount(hget.getCount() - 1);
-            hget.setSubtotal(hget.getPrice().multiply(BigDecimal.valueOf(hget.getCount())));
-            redisUtil.hset(carts, shopid, hget);
+            if (hget.getCount() == 1) {
+                redisUtil.hdel(carts, shopid);
+            } else {
+                hget.setCount(hget.getCount() - 1);
+                hget.setSubtotal(hget.getPrice().multiply(BigDecimal.valueOf(hget.getCount())));
+                redisUtil.hset(carts, shopid, hget);
+            }
         } else {
             System.out.println("不可能到这，我说的");
         }
@@ -183,6 +187,16 @@ public class ICartServiceImpl implements ICartService {
         for (Carts carts1 : cartsList) {
             if (carts1.getIschecked()/* && carts1.getIsstock()*/) {
                 Carts carts2 = new Carts();
+                Long id = carts1.getId();
+                String checkshopdata = HttpRequestUtil.doGet("http://localhost:8084/shop/findshopbyid/" + id, null);
+                JSONObject oshopdata = JSONObject.parseObject(checkshopdata);
+                Integer stock = oshopdata.getInteger("stock");
+                if (carts1.getCount() > stock) {
+                    carts2.setIsstock(false);  //是否有库存
+                } else {
+                    carts2.setIsstock(true);
+                }
+                carts2.setId(carts1.getId());
                 carts2.setShopname(carts1.getShopname());
                 carts2.setShopimg(carts1.getShopimg());
                 carts2.setSubtotal(carts1.getSubtotal());
